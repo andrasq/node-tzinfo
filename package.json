@@ -7,10 +7,12 @@
   "author": "Andras",
   "repository": "https://github.com/andrasq/node-tzinfo.git",
   "license": "Apache-2.0",
-  "scripts": {
-    "test": "qnit test-*"
-  },
   "devDependencies": {
     "qnit": "0.18.2"
+  },
+  "scripts": {
+    "test": "qnit test-*",
+    "coverage": "nyc --reporter lcov --reporter text npm test",
+    "clean": "rm -rf .nyc_output coverage npm-debug.log"
   }
 }
