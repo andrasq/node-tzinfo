@@ -1,0 +1,16 @@
+{
+  "name": "tzinfo",
+  "version": "0.0.0",
+  "description": "parse tzinfo files",
+  "keywords": [ "tz", "tzinfo", "tzdata", "timezone", "parse" ],
+  "main": "index.js",
+  "author": "Andras",
+  "repository": "https://github.com/andrasq/node-tzinfo.git",
+  "license": "Apache-2.0",
+  "scripts": {
+    "test": "qnit test-*"
+  },
+  "devDependencies": {
+    "qnit": "0.18.2"
+  }
+}
