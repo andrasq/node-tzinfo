@@ -11,7 +11,7 @@ Api
 
 ### tzinfo.parseZoneinfo( buf )
 
-Parse the zoneinfo file contained in buf and return it as an object.
+Parse the zoneinfo file contained in `buf` and return it as an object.
 
 Returned object format:
 
@@ -28,13 +28,20 @@ Returned object format:
 
         times:      // array of transition times (timecnt)
         types:      // array of tzinfo indexes describing time period following transition (timecnt)
-        tzinfo:     // array of tzinfo (typecnt) of
-                    //     { tt_gmtoff:, tt_isdst:, tt_abbrind:, isdst: , isgmt: }
+        tzinfo:     // array of tzinfo structs (typecnt) of
+                    //     { idx: , tt_gmtoff: , tt_isdst: , tt_abbrind: , isdst: , isgmt: }
         abbrevs:    // array of tz name abbreviations (asciiz strings totaling charcnt bytes)
         leaps:      // array of leap second descriptors (leapcnt)
         ttisstd:    // array of transitions of tzinfo were std or wallclock times (ttisstdcnt)
         ttisgmt:    // array of transitions of tzinfo were UTC or local time (ttisgmtcnt)
     };
+
+### tzinfo.findTzinfo( zoneinfo, date )
+
+TBD.
+
+Find in the parsed `zoneinfo` the index of the tzinfo struct corresponding to the
+given `date`.
 
 
 Related Work

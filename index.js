@@ -85,11 +85,10 @@ function parseZoneinfo( buf ) {
 
     for (var i=0; i<info.typecnt; i++) {
         info.tzinfo[i] = {
+            idx: i,
             tt_gmtoff: readInt32(buf, pos),     // seconds to add to GMT to get localtime
             tt_isdst: buf[pos+4],               // whether DST in effect
             tt_abbrind: buf[pos+5],             // index into abbrev[] of tz name abbreviation
-            isstd: null,
-            isgmt: null,
         };
         pos += 6;
     }
@@ -112,12 +111,6 @@ function parseZoneinfo( buf ) {
 
     for (var i=0; i<info.ttisgmtcnt; i++) {
         info.ttisgmt[i] = buf[pos++];
-    }
-
-    // annotate tzinfo with isstd and isgmt
-    for (var i=0; i<info.tzinfo.length; i++) {
-        info.tzinfo[i].isstd = info.ttisstd[i];
-        info.tzinfo[i].isgmt = info.ttisgmt[i];
     }
 
     if (info.version === '2') {
@@ -162,7 +155,7 @@ function parseV2Zoneinfo( buf, pos, info ) {
     }
 
     for (var i=0; i<info.typecnt; i++) {
-        info.tzinfo[i] = { tt_gmtoff: readInt32(buf, pos), tt_isdst: buf[pos+4], tt_abbrind: buf[pos+5] };
+        info.tzinfo[i] = { idx: i, tt_gmtoff: readInt32(buf, pos), tt_isdst: buf[pos+4], tt_abbrind: buf[pos+5] };
         pos += 6;
     }
 
@@ -181,12 +174,6 @@ function parseV2Zoneinfo( buf, pos, info ) {
 
     for (var i=0; i<info.ttisgmtcnt; i++) {
         info.ttisgmt[i] = buf[pos++];
-    }
-
-    // annotate tzinfo with isstd and isgmt
-    for (var i=0; i<info.tzinfo.length; i++) {
-        info.tzinfo[i].isstd = info.ttisstd[i];
-        info.tzinfo[i].isgmt = info.ttisgmt[i];
     }
 
     return info;
