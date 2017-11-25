@@ -2,6 +2,10 @@
  * unpack bytes into integers or structs of integers,
  * kinda like php or perl `unpack`.
  *
+ * Copyright (C) 2017 Andras Radics
+ * Licensed under the Apache License, Version 2.0
+ * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+ *
  * 2017-11-25 - Started - AR.
  */
 
