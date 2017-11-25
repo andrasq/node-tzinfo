@@ -54,11 +54,11 @@ function parseZoneinfo( buf ) {
         magic:      buf.toString(null, 0, 4),   // TZif
         version:    buf.toString(null, 4, 5),   // '\0' or '2'
 
-        ttisgmtcnt: readInt32(buf, 20),         // num gmt/local indicators stored in ttisgmt
-        ttisstdcnt: readInt32(buf, 24),         // num standard/wall indicators stored in ttisstd
-        leapcnt:    readInt32(buf, 28),         // num leap seconds for which data is stored in leaptimeTimes
-        timecnt:    readInt32(buf, 32),         // num transition types stored in transitionTypes
-        typecnt:    readInt32(buf, 36),         // num time transition structs stored in localtimeInfo
+        ttisgmtcnt: readInt32(buf, 20),         // num gmt/local indicators stored in `ttisgmt`
+        ttisstdcnt: readInt32(buf, 24),         // num standard/wall indicators stored in `ttisstd`
+        leapcnt:    readInt32(buf, 28),         // num leap seconds for which data is stored in `leaps`
+        timecnt:    readInt32(buf, 32),         // num transition types stored in `types'
+        typecnt:    readInt32(buf, 36),         // num time transition structs stored in `tzinfo`
         charcnt:    readInt32(buf, 40),         // total num chars to store the tz name abbreviations
 
         times:      new Array(),                // transition times (timecnt)
@@ -69,7 +69,7 @@ function parseZoneinfo( buf ) {
         ttisstd:    new Array(),                // transitions of tzinfo were std or wallclock times (ttisstdcnt)
         ttisgmt:    new Array(),                // transitions of tzinfo were UTC or local time (ttisgmtcnt)
     };
-    var pos = 4 + 1 + 15 + 24;          // magic + version + reserved + header
+    var pos = 4 + 1 + 15 + 24;                  // magic + version + reserved + header
 
     if (info.magic !== 'TZif' || (info.version !== '\0' && info.version !== '2')) return false;
 
