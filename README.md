@@ -72,7 +72,7 @@ containing the file contents, or throws an `Error`.
 Change Log
 ----------
 
-- 0.3.0 - `readZoneinfoFile` and `readZoneinfoFileSync`
+- 0.3.0 - `readZoneinfoFile` and `readZoneinfoFileSync`, `findTzinfo`
 - 0.2.0 - first published release, with `parseZoneinfo`
 
 
