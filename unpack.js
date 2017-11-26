@@ -26,7 +26,7 @@ function qunpack( buf, offset, format, count ) {
     if (count === undefined) count = 1;
     if (asArray) values = new Array();
 
-    if (format === 'A') return buf.toString(null, offset, offset+count);
+    if (format === 'A') return buf.toString(undefined, offset, offset+count);
 
     for (var i=0; i<count; i++) {
         // if about to extract the second value, auto-switch to array mode
@@ -45,7 +45,7 @@ function qunpack( buf, offset, format, count ) {
         }
         else if (format[0] === 'A' && format[1] >= '0' && format[1] <= '9') {
             var n = parseInt(format.slice(1));
-            val = buf.toString(null, offset, offset + n);
+            val = buf.toString(undefined, offset, offset + n);
             offset += n;
         }
         else if (format === 'Z') {

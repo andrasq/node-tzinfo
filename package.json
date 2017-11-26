@@ -12,7 +12,7 @@
   },
   "scripts": {
     "test": "qnit test-*",
-    "coverage": "nyc --reporter lcov --reporter text npm test",
+    "coverage": "nyc --include index.js --reporter lcov --reporter text npm test",
     "clean": "rm -rf .nyc_output coverage npm-debug.log"
   }
 }

@@ -61,8 +61,8 @@ function parseZoneinfo( buf ) {
 
 function parseV1Zoneinfo( buf, pos ) {
     var info = {
-        magic:      buf.toString(null, 0, 4),   // 'TZif'
-        version:    buf.toString(null, 4, 5),   // '\0' or '2'
+        magic:   buf.toString(undefined, 0, 4), // 'TZif'
+        version: buf.toString(undefined, 4, 5), // '\0' or '2'
 
         ttisgmtcnt: readInt32(buf, 20),         // num gmt/local indicators stored in `ttisgmt`
         ttisstdcnt: readInt32(buf, 24),         // num standard/wall indicators stored in `ttisstd`
@@ -105,7 +105,7 @@ function parseV1Zoneinfo( buf, pos ) {
         pos += 6;
     }
 
-    var abbrevs = buf.toString(null, pos, pos + info.charcnt - 1);
+    var abbrevs = buf.toString(undefined, pos, pos + info.charcnt - 1);
     info.abbrevs = abbrevs.split('\0');
     pos += info.charcnt;
 
@@ -133,8 +133,8 @@ function parseV1Zoneinfo( buf, pos ) {
 function parseV2Zoneinfo( buf, pos ) {
     // read-read the V2 header, then the V2 data
     var info = {
-        magic:   buf.toString(null, pos+0, pos+4),
-        version: buf.toString(null, pos+4, pos+5),
+        magic:   buf.toString(undefined, pos+0, pos+4),
+        version: buf.toString(undefined, pos+4, pos+5),
 
         ttisgmtcnt: readInt32(buf, pos+20),
         ttisstdcnt: readInt32(buf, pos+24),
@@ -171,7 +171,7 @@ function parseV2Zoneinfo( buf, pos ) {
         pos += 6;
     }
 
-    var abbrevs = buf.toString(null, pos, pos + info.charcnt - 1);
+    var abbrevs = buf.toString(undefined, pos, pos + info.charcnt - 1);
     info.abbrevs = abbrevs.split('\0');
     pos += info.charcnt;
 
