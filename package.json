@@ -1,6 +1,6 @@
 {
   "name": "tzinfo",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "parse tzinfo files",
   "keywords": [ "tz", "tzinfo", "tzdata", "timezone", "parse" ],
   "main": "index.js",

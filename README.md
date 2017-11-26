@@ -16,7 +16,7 @@ Parse the zoneinfo file contained in `buf` and return it as an object.
 Returned object format:
 
     zoneinfo = {
-        magic:      // TZif
+        magic:      // 'TZif'
         version:    // '\0' or '2'
 
         ttisgmtcnt: // num gmt/local indicators stored in `ttisgmt`
@@ -26,14 +26,14 @@ Returned object format:
         typecnt:    // num time transition structs stored in `tzinfo`
         charcnt:    // total num chars to store the tz name abbreviations
 
-        times:      // array of transition times (timecnt)
-        types:      // array of tzinfo indexes describing time period following transition (timecnt)
-        tzinfo:     // array of tzinfo structs (typecnt) of
+        ttimes:     // array of `timecnt` transition times
+        types:      // array of `timecnt` tzinfo indexes describing time period following transition
+        tzinfo:     // array of `typecnt` tzinfo structs
                     //     { idx: , tt_gmtoff: , tt_isdst: , tt_abbrind: }
         abbrevs:    // array of tz name abbreviations (asciiz strings totaling charcnt bytes)
-        leaps:      // array of leap second descriptors (leapcnt)
-        ttisstd:    // array of transitions of tzinfo were std or wallclock times (ttisstdcnt)
-        ttisgmt:    // array of transitions of tzinfo were UTC or local time (ttisgmtcnt)
+        leaps:      // array of `leapcnt` leap second descriptors
+        ttisstd:    // array of `ttisstdcnt` transitions of tzinfo were std or wallclock times
+        ttisgmt:    // array of `ttisgmtcnt` transitions of tzinfo were UTC or local time
     };
 
 ### tzinfo.findTzinfo( zoneinfo, date )
@@ -41,7 +41,8 @@ Returned object format:
 TBD.
 
 Find in the parsed `zoneinfo` the index of the tzinfo struct corresponding to the
-given `date`.
+given `date`.  Returns a `tzinfo` struct or `false` if the date is before the earliest
+known time transition.
 
 Tzinfo format:
 
