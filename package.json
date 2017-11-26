@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "parse tzinfo files",
   "keywords": [ "tz", "tzinfo", "tzdata", "timezone", "parse" ],
-  "main": "index.js",
+  "main": "tzinfo.js",
   "author": "Andras",
   "repository": "https://github.com/andrasq/node-tzinfo.git",
   "license": "Apache-2.0",
@@ -12,7 +12,7 @@
   },
   "scripts": {
     "test": "qnit test-*",
-    "coverage": "nyc --include index.js --reporter lcov --reporter text npm test",
+    "coverage": "nyc --include tzinfo.js --reporter lcov --reporter text npm test",
     "clean": "rm -rf .nyc_output coverage npm-debug.log"
   }
 }
