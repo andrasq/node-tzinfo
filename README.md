@@ -7,7 +7,6 @@ tzinfo
 Functions to parse /usr/share/zoneinfo timezone info files.
 Parses both v1 and v2 format zoneinfo files.
 
-Work in progress.
 
 Api
 ---
