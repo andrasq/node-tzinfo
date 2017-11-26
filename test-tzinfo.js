@@ -127,8 +127,8 @@ module.exports = {
             t.done();
         },
 
-        'should throw if zoneinfo directory not found': function(t) {
-            var myStatSync = function(pathname) { throw new Error('ENOTFOUND') };
+        'should throw if zoneinfo directory not exists': function(t) {
+            var myStatSync = function(pathname) { throw new Error('EEXIST') };
             var spy = t.stub(fs, 'statSync', myStatSync);
             try { tzinfo.findZoneinfoFiles(); t.fail() }
             catch (e) { t.contains(e.message, 'files not found'); }
@@ -136,7 +136,7 @@ module.exports = {
             t.done();
         },
 
-        'should throw if zoneinfo directory not found': function(t) {
+        'should throw if zoneinfo directory not a directory': function(t) {
             var myStatSync = function(pathname) { return { isDirectory: fnFalse } };
             var spy = t.stub(fs, 'statSync', myStatSync);
             try { tzinfo.findZoneinfoFiles(); t.fail() }
@@ -159,7 +159,7 @@ module.exports = {
                 magic: 'TZif', version: '2',
                 ttisgmtcnt: 4, ttisstdcnt: 4, leapcnt: 2,
                 timecnt: 22,   typecnt: 4,    charcnt: 16,
-                abbrevs: ['LMT', 'KMT', 'EST', 'EDT'],
+                abbrevs: 'LMT\0KMT\0EST\0EDT\0',
                 leaps: [ {time: -2, add: 1}, {time: -1, add: 2} ],
             });
             t.done();
@@ -172,7 +172,7 @@ module.exports = {
                 magic: 'TZif', version: '\0',
                 ttisgmtcnt: 3, ttisstdcnt: 3, leapcnt: 2,
                 timecnt: 21,   typecnt: 3,    charcnt: 12,
-                abbrevs: ['KMT', 'EST', 'EDT'],
+                abbrevs: 'KMT\0EST\0EDT\0',
                 leaps: [ {time: -2, add: 1}, {time: -1, add: 2} ],
             });
             t.done();

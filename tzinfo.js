@@ -31,6 +31,7 @@ module.exports = {
     parseZoneinfo: parseZoneinfo,
 
     findZoneinfoFiles: findZoneinfoFiles,
+    readStringZ: readStringZ,
     readInt32: readInt32,
     readInt64: readInt64,
 };
@@ -71,10 +72,10 @@ function parseV1Zoneinfo( buf, pos ) {
         typecnt:    readInt32(buf, 36),         // num time transition structs stored in `tzinfo`
         charcnt:    readInt32(buf, 40),         // total num chars to store the tz name abbreviations
 
-        ttimes:     new Array(),                // transition times (timecnt)
-        types:      new Array(),                // tzinfo index for time period following transition (timecnt)
+        ttimes:     new Array(),                // transition time timestamps (timecnt)
+        types:      new Array(),                // tzinfo index of each time transitioned to (timecnt)
         tzinfo:     new Array(),                // tzinfo structs (typecnt)
-        abbrevs:    new Array(),                // tz name abbreviations (asciiz strings totaling charcnt bytes)
+        abbrevs:    new Array(),                // concatenated tz name abbreviations (asciiz strings totaling charcnt bytes)
         leaps:      new Array(),                // leap second descriptors (leapcnt)
         ttisstd:    new Array(),                // transitions of tzinfo were std or wallclock times (ttisstdcnt)
         ttisgmt:    new Array(),                // transitions of tzinfo were UTC or local time (ttisgmtcnt)
@@ -100,13 +101,17 @@ function parseV1Zoneinfo( buf, pos ) {
             idx: i,
             tt_gmtoff: readInt32(buf, pos),     // seconds to add to GMT to get localtime
             tt_isdst: buf[pos+4],               // whether DST in effect
-            tt_abbrind: buf[pos+5],             // index into abbrev[] of tz name abbreviation
+            tt_abbrind: buf[pos+5],             // byte offset into abbrevs of tz name abbreviation
+            abbrev: null,
         };
         pos += 6;
     }
 
-    var abbrevs = buf.toString(undefined, pos, pos + info.charcnt - 1);
-    info.abbrevs = abbrevs.split('\0');
+    info.abbrevs = buf.toString(undefined, pos, pos + info.charcnt);
+    // annotate the tzinfo structs with the tz name abbrev
+    for (var i=0; i<info.typecnt; i++) {
+        info.tzinfo[i].abbrev = readStringZ(buf, pos + info.tzinfo[i].tt_abbrind);
+    }
     pos += info.charcnt;
 
     for (var i=0; i<info.leapcnt; i++) {
@@ -171,8 +176,11 @@ function parseV2Zoneinfo( buf, pos ) {
         pos += 6;
     }
 
-    var abbrevs = buf.toString(undefined, pos, pos + info.charcnt - 1);
-    info.abbrevs = abbrevs.split('\0');
+    info.abbrevs = buf.toString(undefined, pos, pos + info.charcnt);
+    // annotate the tzinfo structs with the tz name abbrev
+    for (var i=0; i<info.typecnt; i++) {
+        info.tzinfo[i].abbrev = readStringZ(buf, pos + info.tzinfo[i].tt_abbrind);
+    }
     pos += info.charcnt;
 
     for (var i=0; i<info.leapcnt; i++) {
@@ -193,6 +201,11 @@ function parseV2Zoneinfo( buf, pos ) {
     return info;
 }
 
+// return the NUL-terminated string from buf at offset
+function readStringZ( buf, offset ) {
+    for (var end=offset; buf[end] !== 0; end++) ;
+    return buf.toString(undefined, offset, end);
+}
 function readInt32( buf, offset ) {
     var val = (buf[offset++] * 0x1000000) + (buf[offset++] << 16) + (buf[offset++] << 8) + buf[offset++];
     return (val & 0x80000000) ? val - 0x100000000 : val;

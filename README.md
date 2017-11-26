@@ -29,11 +29,11 @@ Returned object format:
         typecnt:    // num time transition structs stored in `tzinfo`
         charcnt:    // total num chars to store the tz name abbreviations
 
-        ttimes:     // array of `timecnt` transition times
-        types:      // array of `timecnt` tzinfo indexes describing time period following transition
+        ttimes:     // array of `timecnt` transition time timestamps
+        types:      // array of `timecnt` tzinfo indices for each time transitioned to
         tzinfo:     // array of `typecnt` tzinfo structs
                     //     { idx: , tt_gmtoff: , tt_isdst: , tt_abbrind: }
-        abbrevs:    // array of tz name abbreviations (asciiz strings totaling charcnt bytes)
+        abbrevs:    // concatenated tz name abbreviations (asciiz strings totaling charcnt bytes)
         leaps:      // array of `leapcnt` leap second descriptors
         ttisstd:    // array of `ttisstdcnt` transitions of tzinfo were std or wallclock times
         ttisgmt:    // array of `ttisgmtcnt` transitions of tzinfo were UTC or local time
@@ -53,11 +53,26 @@ Tzinfo format:
         idx:        // index of this entry in `zoneinfo.tzinfo`
         tt_gmtoff:  // seconds to add to GMT to get localtime
         tt_isdst:   // whether daylight saving is in effect
-        tt_abbrind: // index into abbrev[] of tz name abbreviation
+        tt_abbrind: // byte offset in abbrevs of tz name abbreviation
+        abbrev:     // timezone name abbreviation, eg 'EDT'
     };
 
 To find the POSIX-style timezone environment variable attributes associated with this `tzinfo`,
 look at `zoneinfo.ttisstd[tzinfo.idx]` and `zoneinfo.ttisgmt[tzinfo.idx]`.
+
+### tzinfo.readZoneinfoFile( tzname, cb )
+
+TBD.
+
+### tzinfo.readZoneinfoFileSync( tzname )
+
+TBD.
+
+
+Change Log
+----------
+
+- 0.2.0 - first published release, with `parseZoneinfo`
 
 
 Related Work
