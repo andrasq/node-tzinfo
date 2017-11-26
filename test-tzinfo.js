@@ -274,6 +274,23 @@ module.exports = {
             },
         },
 
+        'readInt64': {
+            'should extrace 64-bit signed int': function(t) {
+                var buf = new Buffer([0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8]);
+                t.equal(tzinfo.readInt64(buf, 0), 0x01020304);
+                t.equal(tzinfo.readInt64(buf, 1), 0x0102030405);
+                t.equal(tzinfo.readInt64(buf, 2), 0x010203040506);
+                t.equal(tzinfo.readInt64(buf, 3), 0x01020304050607);
+
+                var buf = new Buffer([255, 255, 255, 255, 255, 255, 255, 1, 2, 3, 4, 5, 6, 7, 8]);
+                t.equal(tzinfo.readInt64(buf, 0), -256 + 1);
+                t.equal(tzinfo.readInt64(buf, 1), -65536 + 256 + 2);
+                t.equal(tzinfo.readInt64(buf, 2), -16777216 + 65536 + 512 + 3);
+                t.equal(tzinfo.readInt64(buf, 3), -0x100000000 + 16777216 + 2*65536 + 3*256 + 4);
+                t.done();
+            },
+        },
+
         'absearch': {
             'should find an element not larger than val': function(t) {
                 var array = new Array();
