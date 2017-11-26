@@ -11,6 +11,26 @@ Parses both v1 and v2 format zoneinfo files.
 Api
 ---
 
+### tzinfo.getZoneinfoDirectory( )
+
+Return the auto-detected directory containing the system zoneinfo files.
+
+### tzinfo.listZoneinfoFiles( zoneinfoDirectory )
+
+List all the zoneinfo files contained in the named zoneinfo directory.  Recursively
+walks the directory and tests each file found.  This is a blocking operation, so call
+only on program load.  The results are small can be easily cached.
+
+### tzinfo.readZoneinfoFile( tzname, cb )
+
+Read the zoneinfo file corresponding to the named timezone.  Returns to its callback a
+`Buffer` with the file contents, or an `Error`.
+
+### tzinfo.readZoneinfoFileSync( tzname )
+
+Read the zoneinfo file corresponding to the named timezone.  Returns a `Buffer`
+containing the file contents, or throws an `Error`.
+
 ### tzinfo.parseZoneinfo( buf )
 
 Parse the zoneinfo file contained in `buf` and return it as an object.
@@ -56,26 +76,6 @@ Tzinfo format:
 
 To find the POSIX-style timezone environment variable attributes associated with this `tzinfo`,
 look at `zoneinfo.ttisstd[tzinfo.idx]` and `zoneinfo.ttisgmt[tzinfo.idx]`.
-
-### tzinfo.readZoneinfoFile( tzname, cb )
-
-Read the zoneinfo file corresponding to the named timezone.  Returns to its callback a
-`Buffer` with the file contents, or an `Error`.
-
-### tzinfo.readZoneinfoFileSync( tzname )
-
-Read the zoneinfo file corresponding to the named timezone.  Returns a `Buffer`
-containing the file contents, or throws an `Error`.
-
-### tzinfo.getZoneinfoDirectory( )
-
-Return the auto-detected directory containing the system zoneinfo files.
-
-### tzinfo.listZoneinfoFiles( zoneinfoDirectory )
-
-List all the zoneinfo files contained in the named zoneinfo directory.  Recursively
-walks the directory and tests each file found.  This is a blocking operation, so call
-only on program load.  The results are small can be easily cached.
 
 
 Change Log
