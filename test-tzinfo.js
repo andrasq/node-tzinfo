@@ -354,17 +354,26 @@ module.exports = {
     'helpers': {
         'readStringZ': {
             'should extract asciiz string': function(t) {
-                var buf = new Buffer("ABC\0DEF\0GHI\0");
+                var buf = new Buffer("ABC\0DEF\0GHI\0\0");
                 t.equal(tzinfo.readStringZ(buf, 0), 'ABC');
                 t.equal(tzinfo.readStringZ(buf, 1), 'BC');
                 t.equal(tzinfo.readStringZ(buf, 4), 'DEF');
                 t.equal(tzinfo.readStringZ(buf, 5), 'EF');
+                t.equal(tzinfo.readStringZ(buf, 12), '');
+                t.equal(tzinfo.readStringZ(new Buffer("ABC"), 1), 'BC');
                 t.done();
             },
         },
 
         'readInt32': {
             'should extract 32-bit signed int': function(t) {
+                t.equal(tzinfo.readInt32([255, 255, 255, 255], 0), -1);
+
+                var buf = new Buffer([128, 0, 0, 0, 0, 1]);
+                t.equal(tzinfo.readInt32(buf, 0), (1 << 31));
+                t.equal(tzinfo.readInt32(buf, 1), 0);
+                t.equal(tzinfo.readInt32(buf, 2), 1);
+
                 var buf = new Buffer([1, 2, 3, 4, 5, 6, 7, 8]);
                 t.equal(tzinfo.readInt32(buf, 0), 0x01020304);
                 t.equal(tzinfo.readInt32(buf, 1), 0x02030405);
@@ -380,7 +389,14 @@ module.exports = {
         },
 
         'readInt64': {
-            'should extrace 64-bit signed int': function(t) {
+            'should extract 64-bit signed int': function(t) {
+                t.equal(tzinfo.readInt32([255, 255, 255, 255, 255, 255, 255, 255], 0), -1);
+
+                var buf = new Buffer([128, 0, 0, 0, 0, 0, 0, 0, 0, 1]);
+                t.equal(tzinfo.readInt64(buf, 0), -0x8000000000000000);
+                t.equal(tzinfo.readInt64(buf, 1), 0);
+                t.equal(tzinfo.readInt64(buf, 2), 1);
+
                 var buf = new Buffer([0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8]);
                 t.equal(tzinfo.readInt64(buf, 0), 0x01020304);
                 t.equal(tzinfo.readInt64(buf, 1), 0x0102030405);

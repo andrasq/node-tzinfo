@@ -211,7 +211,7 @@ function parseV2Zoneinfo( buf, pos ) {
 
 // return the NUL-terminated string from buf at offset
 function readStringZ( buf, offset ) {
-    for (var end=offset; buf[end] !== 0; end++) ;
+    for (var end=offset; buf[end]; end++) ;
     return buf.toString(undefined, offset, end);
 }
 function readInt32( buf, offset ) {

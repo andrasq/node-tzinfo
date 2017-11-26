@@ -81,6 +81,7 @@ look at `zoneinfo.ttisstd[tzinfo.idx]` and `zoneinfo.ttisgmt[tzinfo.idx]`.
 Change Log
 ----------
 
+- 0.4.2 - more tests, make `readStringZ` stop on unterminated strings
 - 0.4.1 - npm tag
 - 0.4.0 - `listZoneinfoFiles()`, `getZoneinfoDirectory()`
 - 0.3.0 - `readZoneinfoFile` and `readZoneinfoFileSync`, `findTzinfo`
