@@ -32,6 +32,7 @@ module.exports = {
     parseZoneinfo: parseZoneinfo,
     readZoneinfoFileSync: readZoneinfoFileSync,
     readZoneinfoFile: readZoneinfoFile,
+    findTzinfo: findTzinfo,
 
     absearch: absearch,
     findZoneinfoFiles: findZoneinfoFiles,
@@ -255,6 +256,18 @@ function readZoneinfoFileSync( tzname ) {
 function readZoneinfoFile( tzname, cb ) {
     var filepath = zoneinfoDir + '/' + tzname;
     return fs.readFile(filepath, cb);
+}
+
+function findTzinfo( info, date ) {
+    var seconds = ((typeof date === 'number') ? date :
+                   (date && typeof date.getTime === 'function') ? date.getTime() :
+                   new Date(date).getTime()) / 1000;
+
+    var index = module.exports.absearch(info.ttimes, seconds);
+    if (index < 0) return false;
+
+    var tzindex = info.types[index];
+    return info.tzinfo[tzindex];
 }
 
 // search the sorted array for the index of the largest element

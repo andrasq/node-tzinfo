@@ -41,11 +41,9 @@ Returned object format:
 
 ### tzinfo.findTzinfo( zoneinfo, date )
 
-TBD.
-
 Find in the parsed `zoneinfo` the index of the tzinfo struct corresponding to the
 given `date`.  Returns a `tzinfo` struct or `false` if the date is before the earliest
-known time transition.
+time transition on record or if date is not valid.
 
 Tzinfo format:
 

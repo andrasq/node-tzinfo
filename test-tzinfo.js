@@ -101,6 +101,22 @@ var ziJamaica = new Buffer([
 0x0a, 0x45, 0x53, 0x54, 0x35,
 ]);
 
+/*----------------
+For testing, here are the last few lines from Jamaica before it stopped DST:
+% zdump -v America/Jamaica
+...
+America/Jamaica  Sun Apr 25 06:59:59 1982 UT = Sun Apr 25 01:59:59 1982 EST isdst=0 gmtoff=-18000
+America/Jamaica  Sun Apr 25 07:00:00 1982 UT = Sun Apr 25 03:00:00 1982 EDT isdst=1 gmtoff=-14400
+America/Jamaica  Sun Oct 31 05:59:59 1982 UT = Sun Oct 31 01:59:59 1982 EDT isdst=1 gmtoff=-14400
+America/Jamaica  Sun Oct 31 06:00:00 1982 UT = Sun Oct 31 01:00:00 1982 EST isdst=0 gmtoff=-18000
+America/Jamaica  Sun Apr 24 06:59:59 1983 UT = Sun Apr 24 01:59:59 1983 EST isdst=0 gmtoff=-18000
+America/Jamaica  Sun Apr 24 07:00:00 1983 UT = Sun Apr 24 03:00:00 1983 EDT isdst=1 gmtoff=-14400
+America/Jamaica  Sun Oct 30 05:59:59 1983 UT = Sun Oct 30 01:59:59 1983 EDT isdst=1 gmtoff=-14400
+America/Jamaica  Sun Oct 30 06:00:00 1983 UT = Sun Oct 30 01:00:00 1983 EST isdst=0 gmtoff=-18000
+America/Jamaica  Mon Jan 18 03:14:07 2038 UT = Sun Jan 17 22:14:07 2038 EST isdst=0 gmtoff=-18000
+America/Jamaica  Tue Jan 19 03:14:07 2038 UT = Mon Jan 18 22:14:07 2038 EST isdst=0 gmtoff=-18000
+---------------- */
+
 var fnTrue = function fnTrue() { return true };
 var fnFalse = function fnFalse() { return false };
 
@@ -200,7 +216,7 @@ module.exports = {
     },
 
     'parseZoneinfo': {
-        'setUp': function(done) {
+        'tearDown': function(done) {
             ziJamaica[4] = '2'.charCodeAt(0);
             ziJamaica[201 + 4] = '2'.charCodeAt(0);
             done();
@@ -242,6 +258,47 @@ module.exports = {
             ziJamaica[201+4] = 2;
             var info = tzinfo.parseZoneinfo(ziJamaica);
             t.strictEqual(info, false);
+            t.done();
+        },
+    },
+
+    'findTzinfo': {
+        'before': function(done) {
+            this.zinfo = tzinfo.parseZoneinfo(ziJamaica);
+            done();
+        },
+
+        'should find the tzinfo of a timestamp': function(t) {
+            var times = [
+                'Sun Apr 25 06:59:59 1982 UTC',         // before DST
+                '1982-04-25T06:59:59Z',                 // same before DST, test notation too
+                'Sun Apr 25 07:00:00 1982 UTC',         // after DST
+                'Sun Aug 25 07:02:04 1982 UTC',         // same DST, a few months later
+            ];
+            var checks = { strings: [], dates: [], millis: [] };
+            for (var i=0; i<times.length; i++) checks.strings.push(times[i]);
+            for (var i=0; i<times.length; i++) checks.dates.push(new Date(times[i]));
+            for (var i=0; i<times.length; i++) checks.millis.push(new Date(times[i]).getTime());
+            for (var dateType in checks) {
+                var tz1 = tzinfo.findTzinfo(this.zinfo, checks[dateType][0]);
+                t.equal(tz1.abbrev, 'EST');
+                t.equal(tz1.tt_gmtoff, -18000);
+
+                var tz2 = tzinfo.findTzinfo(this.zinfo, checks[dateType][1]);
+                t.equal(tz2, tz1);
+
+                var tz2 = tzinfo.findTzinfo(this.zinfo, checks[dateType][2]);
+                t.equal(tz2.abbrev, 'EDT');
+                t.equal(tz2.tt_gmtoff, -14400);
+
+                var tz3 = tzinfo.findTzinfo(this.zinfo, checks[dateType][3]);
+                t.equal(tz3, tz2);
+            }
+            t.done();
+        },
+
+        'should return false if the timestamp is too early': function(t) {
+            t.equal(tzinfo.findTzinfo(this.zinfo, '1801-01-01T01:02:03Z'), false);
             t.done();
         },
     },
