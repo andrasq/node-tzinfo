@@ -121,11 +121,18 @@ var fnTrue = function fnTrue() { return true };
 var fnFalse = function fnFalse() { return false };
 
 module.exports = {
-    'findZoneinfoFiles': {
+    'locateZoneinfoDirectory': {
+        'should have located the zoneinfo directory when loaded': function(t) {
+            var dir = tzinfo.zoneinfoDir;
+            t.equal(dir[0], '/');
+            t.contains(dir, '/zoneinfo');
+            t.done();
+        },
+
         'should locate zoneinfo directory': function(t) {
             var myStatSync = function(pathname) { return { isDirectory: fnTrue } };
             var spy = t.stubOnce(fs, 'statSync', myStatSync);
-            var dirname = tzinfo.findZoneinfoFiles();
+            var dirname = tzinfo.locateZoneinfoDirectory();
             t.equal(spy.callCount, 1);
             t.equal(dirname, '/usr/share/zoneinfo');
             t.done();
@@ -137,7 +144,7 @@ module.exports = {
                 return callCount++ === 0 ? { isDirectory: fnFalse } : { isDirectory: fnTrue }
             };
             var spy = t.stub(fs, 'statSync', myStatSync);
-            var dirname = tzinfo.findZoneinfoFiles();
+            var dirname = tzinfo.locateZoneinfoDirectory();
             spy.restore();
             t.equal(spy.callCount, 2);
             t.equal(dirname, '/usr/lib/zoneinfo');
@@ -147,7 +154,7 @@ module.exports = {
         'should throw if zoneinfo directory not exists': function(t) {
             var myStatSync = function(pathname) { throw new Error('ENOENT') };
             var spy = t.stub(fs, 'statSync', myStatSync);
-            try { tzinfo.findZoneinfoFiles(); t.fail() }
+            try { tzinfo.locateZoneinfoDirectory(); t.fail() }
             catch (e) { t.contains(e.message, 'files not found'); }
             spy.restore();
             t.done();
@@ -156,7 +163,7 @@ module.exports = {
         'should throw if zoneinfo directory not a directory': function(t) {
             var myStatSync = function(pathname) { return { isDirectory: fnFalse } };
             var spy = t.stub(fs, 'statSync', myStatSync);
-            try { tzinfo.findZoneinfoFiles(); t.fail() }
+            try { tzinfo.locateZoneinfoDirectory(); t.fail() }
             catch (e) { t.contains(e.message, 'files not found'); }
             spy.restore();
             t.done();
@@ -268,6 +275,13 @@ module.exports = {
             done();
         },
 
+        'should call absearch': function(t) {
+            var spy = t.spyOnce(tzinfo, 'absearch');
+            tzinfo.findTzinfo(this.zinfo, 12345678);
+            t.equal(spy.callCount, 1);
+            t.done();
+        },
+
         'should find the tzinfo of a timestamp': function(t) {
             var times = [
                 'Sun Apr 25 06:59:59 1982 UTC',         // before DST
@@ -299,6 +313,40 @@ module.exports = {
 
         'should return false if the timestamp is too early': function(t) {
             t.equal(tzinfo.findTzinfo(this.zinfo, '1801-01-01T01:02:03Z'), false);
+            t.done();
+        },
+    },
+
+    'getZoneinfoDirectory': {
+        'should return directory located at load time': function(t) {
+            var dirname = tzinfo.getZoneinfoDirectory();
+            try {
+                var stat = fs.statSync(dirname + '/America');
+                t.ok(stat.isDirectory());
+                t.done();
+            } catch(err) {
+                t.fail();
+            }
+        },
+    },
+
+    'listZoneinfoFiles': {
+        'should return empty array if not a directory': function(t) {
+            var list = tzinfo.listZoneinfoFiles("/nonesuch");
+            t.deepEqual(list, []);
+            t.done();
+        },
+
+        'should return list of zoneinfo filepaths': function(t) {
+            var tzdir = tzinfo.getZoneinfoDirectory();
+            var list = tzinfo.listZoneinfoFiles(tzdir);
+            t.contains(list, tzdir + '/' + "America/Los_Angeles");
+            t.done();
+        },
+
+        'should return empty array if no zoneinfo files found': function(t) {
+            var list = tzinfo.listZoneinfoFiles(__dirname);
+            t.deepEqual(list, []);
             t.done();
         },
     },

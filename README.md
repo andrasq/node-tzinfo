@@ -67,10 +67,21 @@ Read the zoneinfo file corresponding to the named timezone.  Returns to its call
 Read the zoneinfo file corresponding to the named timezone.  Returns a `Buffer`
 containing the file contents, or throws an `Error`.
 
+### tzinfo.getZoneinfoDirectory( )
+
+Return the auto-detected directory containing the system zoneinfo files.
+
+### tzinfo.listZoneinfoFiles( zoneinfoDirectory )
+
+List all the zoneinfo files contained in the named zoneinfo directory.  Recursively
+walks the directory and tests each file found.  This is a blocking operation, so call
+only on program load.  The results are small can be easily cached.
+
 
 Change Log
 ----------
 
+- 0.4.0 - `listZoneinfoFiles()`, `getZoneinfoDirectory()`
 - 0.3.0 - `readZoneinfoFile` and `readZoneinfoFileSync`, `findTzinfo`
 - 0.2.0 - first published release, with `parseZoneinfo`
 
@@ -86,3 +97,4 @@ Related Work
 ------------
 
 - [zoneinfo](http://npmjs.com/package/zoneinfo)
+- `tzfile(5)`, `zdump(8)`, `zic(8)` - unix zoneinfo manpages

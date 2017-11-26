@@ -26,16 +26,19 @@
 'use strict';
 
 var fs = require('fs');
-var zoneinfoDir = findZoneinfoFiles();
+var zoneinfoDir = locateZoneinfoDirectory();
 
 module.exports = {
-    parseZoneinfo: parseZoneinfo,
+    getZoneinfoDirectory: getZoneinfoDirectory,
+    listZoneinfoFiles: listZoneinfoFiles,
     readZoneinfoFileSync: readZoneinfoFileSync,
     readZoneinfoFile: readZoneinfoFile,
+    parseZoneinfo: parseZoneinfo,
     findTzinfo: findTzinfo,
 
     absearch: absearch,
-    findZoneinfoFiles: findZoneinfoFiles,
+    locateZoneinfoDirectory: locateZoneinfoDirectory,
+    zoneinfoDir: zoneinfoDir,
     readStringZ: readStringZ,
     readInt32: readInt32,
     readInt64: readInt64,
@@ -233,7 +236,7 @@ function readInt64( buf, offset ) {
 }
 
 
-function findZoneinfoFiles( ) {
+function locateZoneinfoDirectory( ) {
     var tryDirs = [
         '/usr/share/zoneinfo',
         '/usr/lib/zoneinfo',
@@ -291,6 +294,42 @@ function absearch( array, val ) {
 
     // if val is less than all elements in the array, return -1
     return -1;
+}
+
+function getZoneinfoDirectory( ) {
+    return zoneinfoDir;
+}
+
+// find the names of all the zoneinfo files on the system.
+// This is a blocking operation, so call it only on startup.
+// The list is small, 80 kb or so, so can be cached.
+function listZoneinfoFiles( dirname ) {
+    var tzfiles = new Array();
+    try {
+        var files = fs.readdirSync(dirname);
+    } catch (err) {
+        return [];
+    }
+
+    var stat, buf = new Buffer(8);
+    for (var i=0; i<files.length; i++) {
+        var filepath = dirname + '/' + files[i];
+        try {
+            stat = fs.statSync(filepath);
+            if (stat.isDirectory()) {
+                var moreTzfiles = listZoneinfoFiles(filepath);
+                tzfiles = tzfiles.concat(moreTzfiles);
+            }
+            else {
+                var fd = fs.openSync(filepath, 'r');
+                fs.readSync(fd, buf, 0, 5, 0);
+                fs.closeSync(fd);
+                if (buf.toString(undefined, 0, 4) === 'TZif') tzfiles.push(filepath);
+            }
+        } catch(e) { }
+    }
+
+    return tzfiles;
 }
 
 /** quicktest:
