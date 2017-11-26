@@ -90,9 +90,6 @@ Change Log
 Todo
 ----
 
-- `listZoneinfoFiles()` - recursive walkdir, open each file and check the magic
-- `getZoneinfoDirectory()` - return the dirname detected on load
-
 
 Related Work
 ------------
