@@ -81,6 +81,7 @@ look at `zoneinfo.ttisstd[tzinfo.idx]` and `zoneinfo.ttisgmt[tzinfo.idx]`.
 Change Log
 ----------
 
+- 0.4.1 - npm tag
 - 0.4.0 - `listZoneinfoFiles()`, `getZoneinfoDirectory()`
 - 0.3.0 - `readZoneinfoFile` and `readZoneinfoFileSync`, `findTzinfo`
 - 0.2.0 - first published release, with `parseZoneinfo`
