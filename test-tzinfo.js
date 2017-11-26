@@ -87,6 +87,7 @@ var ziJamaica = new Buffer([
 
 // leapcnt pairs of numbers, 8-byte quadword timestamp and 4-byte seconds count to add to GMT
 // we store two back-to-back leap seconds just prior to 1970-01-01 GMT.
+// TODO: verify that this 12-byte format is correct (manpage says so)
 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfe, 0x00, 0x00, 0x00, 0x01,
 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x02,
 
@@ -128,7 +129,7 @@ module.exports = {
         },
 
         'should throw if zoneinfo directory not exists': function(t) {
-            var myStatSync = function(pathname) { throw new Error('EEXIST') };
+            var myStatSync = function(pathname) { throw new Error('ENOENT') };
             var spy = t.stub(fs, 'statSync', myStatSync);
             try { tzinfo.findZoneinfoFiles(); t.fail() }
             catch (e) { t.contains(e.message, 'files not found'); }
@@ -143,6 +144,58 @@ module.exports = {
             catch (e) { t.contains(e.message, 'files not found'); }
             spy.restore();
             t.done();
+        },
+    },
+
+    'readZoneinfoFileSync': {
+        'should call fs.readFileSync': function(t) {
+            var spy = t.spyOnce(fs, 'readFileSync');
+            var buf = tzinfo.readZoneinfoFileSync("America/New_York");
+            t.equal(spy.callCount, 1);
+            t.contains(spy.callArguments[0], "America/New_York");
+            t.done();
+        },
+
+        'should read zoneinfo file': function(t) {
+            var buf = tzinfo.readZoneinfoFileSync("America/New_York");
+            var info = tzinfo.parseZoneinfo(buf);
+            t.contains(info.abbrevs, 'EDT\0');
+            t.contains(info.abbrevs, 'EST\0');
+            t.done();
+        },
+
+        'should throw if timezone not found': function(t) {
+            t.throws(function() {
+                tzinfo.readZoneinfoFileSync("America/Nonesuch");
+            });
+            t.done();
+        },
+    },
+
+    'readZoneinfoFile': {
+        'should call fs.readFile': function(t) {
+            var spy = t.spyOnce(fs, 'readFileSync');
+            var buf = tzinfo.readZoneinfoFileSync("America/New_York");
+            t.equal(spy.callCount, 1);
+            t.contains(spy.callArguments[0], "America/New_York");
+            t.done();
+        },
+
+        'should read zoneinfo file': function(t) {
+            tzinfo.readZoneinfoFile("America/New_York", function(err, buf) {
+                var info = tzinfo.parseZoneinfo(buf);
+                t.contains(info.abbrevs, 'EDT\0');
+                t.contains(info.abbrevs, 'EST\0');
+                t.done();
+            })
+        },
+
+        'should return errors': function(t) {
+            tzinfo.readZoneinfoFile("America/Nonesuch", function(err, buf) {
+                t.ok(err);
+                t.contains(err.message, 'ENOENT');
+                t.done();
+            })
         },
     },
 

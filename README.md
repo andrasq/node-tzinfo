@@ -62,16 +62,19 @@ look at `zoneinfo.ttisstd[tzinfo.idx]` and `zoneinfo.ttisgmt[tzinfo.idx]`.
 
 ### tzinfo.readZoneinfoFile( tzname, cb )
 
-TBD.
+Read the zoneinfo file corresponding to the named timezone.  Returns to its callback a
+`Buffer` with the file contents, or an `Error`.
 
 ### tzinfo.readZoneinfoFileSync( tzname )
 
-TBD.
+Read the zoneinfo file corresponding to the named timezone.  Returns a `Buffer`
+containing the file contents, or throws an `Error`.
 
 
 Change Log
 ----------
 
+- 0.3.0 - `readZoneinfoFile` and `readZoneinfoFileSync`
 - 0.2.0 - first published release, with `parseZoneinfo`
 
 

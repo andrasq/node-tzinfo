@@ -26,9 +26,12 @@
 'use strict';
 
 var fs = require('fs');
+var zoneinfoDir = findZoneinfoFiles();
 
 module.exports = {
     parseZoneinfo: parseZoneinfo,
+    readZoneinfoFileSync: readZoneinfoFileSync,
+    readZoneinfoFile: readZoneinfoFile,
 
     findZoneinfoFiles: findZoneinfoFiles,
     readStringZ: readStringZ,
@@ -38,10 +41,10 @@ module.exports = {
 
 
 // zoneinfo file layout: (see tzinfo(5) manpage)
-// 44 byte header =
+// header:
 //     20B: 'TZif' + <version> + <15 zero bytes>
 //     24B:  6 4-byte counts
-// payload:
+// data:
 //     timecnt 4B transition times
 //     timecnt 1B ttinfo indexes
 //     typecnt 6B ttinfo structs: 4B gmtoffs, 1B isdst, 1B abbr idx
@@ -243,6 +246,15 @@ function findZoneinfoFiles( ) {
     throw new Error("tzinfo files not found");
 }
 
+function readZoneinfoFileSync( tzname ) {
+    var filepath = zoneinfoDir + '/' + tzname;
+    return fs.readFileSync(filepath);
+}
+
+function readZoneinfoFile( tzname, cb ) {
+    var filepath = zoneinfoDir + '/' + tzname;
+    return fs.readFile(filepath, cb);
+}
 
 /** quicktest:
 
