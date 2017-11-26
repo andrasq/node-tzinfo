@@ -247,6 +247,33 @@ module.exports = {
     },
 
     'helpers': {
+        'readStringZ': {
+            'should extract asciiz string': function(t) {
+                var buf = new Buffer("ABC\0DEF\0GHI\0");
+                t.equal(tzinfo.readStringZ(buf, 0), 'ABC');
+                t.equal(tzinfo.readStringZ(buf, 1), 'BC');
+                t.equal(tzinfo.readStringZ(buf, 4), 'DEF');
+                t.equal(tzinfo.readStringZ(buf, 5), 'EF');
+                t.done();
+            },
+        },
+
+        'readInt32': {
+            'should extract 32-bit signed int': function(t) {
+                var buf = new Buffer([1, 2, 3, 4, 5, 6, 7, 8]);
+                t.equal(tzinfo.readInt32(buf, 0), 0x01020304);
+                t.equal(tzinfo.readInt32(buf, 1), 0x02030405);
+                t.equal(tzinfo.readInt32(buf, 3), 0x04050607);
+
+                var buf = new Buffer([255, 255, 255, 255, 1, 2, 3, 4]);
+                t.equal(tzinfo.readInt32(buf, 0), -1);
+                t.equal(tzinfo.readInt32(buf, 1), (0xffffff01 >> 0));   // -256 + 1
+                t.equal(tzinfo.readInt32(buf, 2), (0xffff0102 >> 0));   // -65536 + 256 + 2
+                t.equal(tzinfo.readInt32(buf, 3), (0xff010203 >> 0));   // -16777216 + 65536 + 512 + 3);
+                t.done();
+            },
+        },
+
         'absearch': {
             'should find an element not larger than val': function(t) {
                 var array = new Array();
