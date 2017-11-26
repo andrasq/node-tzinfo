@@ -75,11 +75,14 @@ Change Log
 - 0.2.0 - first published release, with `parseZoneinfo`
 
 
+Todo
+----
+
+- `listZoneinfoFiles()` - recursive walkdir, open each file and check the magic
+- `getZoneinfoDirectory()` - return the dirname detected on load
+
+
 Related Work
 ------------
 
 - [zoneinfo](http://npmjs.com/package/zoneinfo)
-
-
-Todo
-----
