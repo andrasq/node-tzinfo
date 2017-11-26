@@ -245,4 +245,29 @@ module.exports = {
             t.done();
         },
     },
+
+    'helpers': {
+        'absearch': {
+            'should find an element not larger than val': function(t) {
+                var array = new Array();
+                for (var i=10; i<=1000; i+=10) array.push(i);
+                for (var i=11; i<=1001; i+=10) {
+                    var ix = tzinfo.absearch(array, i);
+                    t.equal(array[ix], i - 1, "absearch for " + i);
+                }
+                for (var i=19; i<=1009; i+=10) {
+                    var ix = tzinfo.absearch(array, i);
+                    t.equal(array[ix], i - 9, "absearch for " + i);
+                }
+                for (var i=10; i<=1000; i+=10) {
+                    var ix = tzinfo.absearch(array, i);
+                    t.equal(array[ix], i, "absearch for " + i);
+                }
+                t.equal(tzinfo.absearch(array, 1), -1);
+                t.equal(tzinfo.absearch(array, 9), -1);
+                t.equal(tzinfo.absearch(array, 10), 0);
+                t.done();
+            },
+        },
+    },
 }

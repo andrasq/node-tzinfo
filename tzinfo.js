@@ -33,6 +33,7 @@ module.exports = {
     readZoneinfoFileSync: readZoneinfoFileSync,
     readZoneinfoFile: readZoneinfoFile,
 
+    absearch: absearch,
     findZoneinfoFiles: findZoneinfoFiles,
     readStringZ: readStringZ,
     readInt32: readInt32,
@@ -254,6 +255,29 @@ function readZoneinfoFileSync( tzname ) {
 function readZoneinfoFile( tzname, cb ) {
     var filepath = zoneinfoDir + '/' + tzname;
     return fs.readFile(filepath, cb);
+}
+
+// search the sorted array for the index of the largest element
+// not greater than val.  Returns the index of the element if found, else -1.
+function absearch( array, val ) {
+    var hi, lo, mid;
+
+    // binary search to approximate the location of val
+    for (lo = 0, hi = array.length - 1; (hi - lo) > 30; ) {
+        mid = ((hi + lo) / 2) >>> 0;
+        if (val < array[mid]) hi = mid - 1;
+        else lo = mid;
+    }
+
+    // once close enough, switch to linear search for speed
+    // scan to find the first element larger than val
+    while (lo <= hi && array[lo] <= val) lo++;
+
+    // if such an element exists, we want the preceding element thats <= val
+    if (lo > 0) return lo - 1;
+
+    // if val is less than all elements in the array, return -1
+    return -1;
 }
 
 /** quicktest:
