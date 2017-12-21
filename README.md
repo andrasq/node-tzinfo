@@ -19,7 +19,7 @@ Return the auto-detected directory containing the system zoneinfo files.
 
 List all the zoneinfo files contained in the named zoneinfo directory.  Recursively
 walks the directory and tests each file found.  This is a blocking operation, so call
-only on program load.  The results are small can be easily cached.
+only on program load.  The results are small and can be easily cached.
 
 ### tzinfo.readZoneinfoFile( tzname, cb )
 
@@ -90,6 +90,8 @@ Change Log
 
 Todo
 ----
+
+- `setZoneinfoDirectory` to override the auto-detected one
 
 
 Related Work
