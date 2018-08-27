@@ -313,6 +313,7 @@ module.exports = {
 
         'should return false if the timestamp is too early': function(t) {
             t.equal(tzinfo.findTzinfo(this.zinfo, '1801-01-01T01:02:03Z'), false);
+            t.equal(tzinfo.findTzinfo(this.zinfo, '1801-01-01T01:02:03Z', true).tt_gmtoff, -18000);
             t.done();
         },
     },

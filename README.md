@@ -58,11 +58,12 @@ Returned object format:
         ttisgmt:    // array of `ttisgmtcnt` transitions of tzinfo were UTC or local time
     };
 
-### tzinfo.findTzinfo( zoneinfo, date )
+### tzinfo.findTzinfo( zoneinfo, date [,firstIfTooOld] )
 
 Find in the parsed `zoneinfo` the index of the tzinfo struct corresponding to the
 given `date`.  Returns a `tzinfo` struct or `false` if the date is before the earliest
-time transition on record or if date is not valid.
+time transition on record or if date is not valid.  If `firstIfTooOld` is truthy,
+it returns not false but the oldest available tzinfo struct.
 
 Tzinfo format:
 
@@ -81,6 +82,7 @@ look at `zoneinfo.ttisstd[tzinfo.idx]` and `zoneinfo.ttisgmt[tzinfo.idx]`.
 Change Log
 ----------
 
+- 0.5.0 - findTzinfo option to return the oldest known tzinfo struct for very old dates
 - 0.4.2 - more tests, make `readStringZ` stop on unterminated strings
 - 0.4.1 - npm tag
 - 0.4.0 - `listZoneinfoFiles()`, `getZoneinfoDirectory()`

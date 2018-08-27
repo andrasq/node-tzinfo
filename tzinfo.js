@@ -261,13 +261,16 @@ function readZoneinfoFile( tzname, cb ) {
     return fs.readFile(filepath, cb);
 }
 
-function findTzinfo( info, date ) {
+function findTzinfo( info, date, firstIfTooOld ) {
     var seconds = ((typeof date === 'number') ? date :
                    (date && typeof date.getTime === 'function') ? date.getTime() :
                    new Date(date).getTime()) / 1000;
 
     var index = module.exports.absearch(info.ttimes, seconds);
-    if (index < 0) return false;
+    if (index < 0) {
+        if (!firstIfTooOld) return false;
+        index = info.types[0];
+    }
 
     var tzindex = info.types[index];
     return info.tzinfo[tzindex];
