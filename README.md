@@ -62,8 +62,10 @@ Returned object format:
 
 Find in the parsed `zoneinfo` the index of the tzinfo struct corresponding to the
 given `date`.  Returns a `tzinfo` struct or `false` if the date is before the earliest
-time transition on record or if date is not valid.  If `firstIfTooOld` is truthy,
-it returns not false but the oldest available tzinfo struct.
+time transition on record or if date is not valid.  If `date` precedes the first known
+time transition but `firstIfTooOld` is truthy, it returns the oldest tzinfo struct.
+If there are no time transitions defined but there is a tzinfo struct, it returns the
+tzinfo struct (to always succeed for GMT and UTC).
 
 Tzinfo format:
 
@@ -82,6 +84,7 @@ look at `zoneinfo.ttisstd[tzinfo.idx]` and `zoneinfo.ttisgmt[tzinfo.idx]`.
 Change Log
 ----------
 
+- 0.5.1 - always find GMT zoneinfo
 - 0.5.0 - findTzinfo option to return the oldest known tzinfo struct for very old dates
 - 0.4.2 - more tests, make `readStringZ` stop on unterminated strings
 - 0.4.1 - npm tag
