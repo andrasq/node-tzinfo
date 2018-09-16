@@ -7,8 +7,11 @@
   "author": "Andras",
   "repository": "https://github.com/andrasq/node-tzinfo.git",
   "license": "Apache-2.0",
+
+  "dependencies": {
+  },
   "devDependencies": {
-    "qnit": "0.18.2"
+    "qnit": "0.25.0"
   },
   "scripts": {
     "test": "qnit test-*",
