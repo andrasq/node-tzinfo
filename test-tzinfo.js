@@ -290,6 +290,24 @@ module.exports = {
             t.done();
         },
 
+        'should always find GMT zinfo': function(t) {
+            var ziGmt = tzinfo.parseZoneinfo(tzinfo.readZoneinfoFileSync("GMT"));
+            var ziUtc = tzinfo.parseZoneinfo(tzinfo.readZoneinfoFileSync("UTC"));
+            var now = new Date();
+
+            t.ok(tzinfo.findTzinfo(ziGmt, now));
+            t.ok(tzinfo.findTzinfo(ziGmt, -10000000000));
+            t.ok(tzinfo.findTzinfo(ziGmt, 0));
+            t.ok(tzinfo.findTzinfo(ziGmt, '2999-01-01T01:02:03Z'));
+
+            t.ok(tzinfo.findTzinfo(ziUtc, now));
+            t.ok(tzinfo.findTzinfo(ziUtc, -10000000000));
+            t.ok(tzinfo.findTzinfo(ziUtc, 0));
+            t.ok(tzinfo.findTzinfo(ziUtc, '2999-01-01T01:02:03Z'));
+
+            t.done();
+        },
+
         'should find the tzinfo of a timestamp': function(t) {
             var times = [
                 'Sun Apr 25 06:59:59 1982 UTC',         // before DST
@@ -310,7 +328,7 @@ module.exports = {
                 t.equal(tz2, tz1);
 
                 var tz2 = tzinfo.findTzinfo(this.zinfo, checks[dateType][2]);
-                t.equal(tz2.abbrev, 'EDT');
+                t.equal(tz2.abbrev, 'EDT', 'test "' + dateType + '": ' + checks[dateType][2]);
                 t.equal(tz2.tt_gmtoff, -14400);
 
                 var tz3 = tzinfo.findTzinfo(this.zinfo, checks[dateType][3]);

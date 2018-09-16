@@ -1,7 +1,7 @@
 /**
  * parse tzinfo files
  *
- * Copyright (C) 2017 Andras Radics
+ * Copyright (C) 2017-2018 Andras Radics
  * Licensed under the Apache License, Version 2.0
  * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -168,6 +168,7 @@ function parseV2Zoneinfo( buf, pos ) {
     };
     pos += 4 + 1 + 15 + 24;
 
+    // TODO: maybe should throw if not parseable
     if (info.magic !== 'TZif' || (info.version !== '\0' && info.version !== '2')) return false;
 
     for (var i=0; i<info.timecnt; i++) {
@@ -262,18 +263,27 @@ function readZoneinfoFile( tzname, cb ) {
 }
 
 function findTzinfo( info, date, firstIfTooOld ) {
-    var seconds = ((typeof date === 'number') ? date :
-                   (date && typeof date.getTime === 'function') ? date.getTime() :
-                   new Date(date).getTime()) / 1000;
+    var seconds = ((typeof date === 'number') ? date :          // milliseconds
+                   (date instanceof Date) ? date.getTime() :    // Date object
+                   new Date(date).getTime());                   // datetime string
+    seconds = Math.floor(seconds / 1000);
 
     var index = module.exports.absearch(info.ttimes, seconds);
-    if (index < 0) {
-        if (!firstIfTooOld) return false;
-        index = info.types[0];
-    }
+    var tzindex;
 
-    var tzindex = info.types[index];
-    return info.tzinfo[tzindex];
+    // if found, return the zoneinfo associated with the preceding time transition
+    //   info.ttimes[] is the sorted array of time trantision unix timestamps
+    //   info.types[] is the array of tzinfo[] indexes matching the time transitions
+    //   info.tzinfo[] is the array of zoneinfo information
+    if (index >= 0) return info.tzinfo[info.types[index]];
+
+    // if there are no time transitions but yes tzinfo, return the tzinfo (to always find GMT/UTC)
+    if (!info.timecnt && info.typecnt) return info.tzinfo[0];
+
+    // if timestamp is before first transition, optionally return the oldest known tzinfo
+    if (firstIfTooOld && info.typecnt) return info.tzinfo[info.types[0]];
+
+    return false;
 }
 
 // search the sorted array for the index of the largest element
