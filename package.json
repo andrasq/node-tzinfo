@@ -14,20 +14,25 @@
   "repository": "https://github.com/andrasq/node-tzinfo.git",
   "license": "Apache-2.0",
   "dependencies": {
-    "grunt": "^1.4.1",
-    "grunt-run": "^0.8.1"
   },
   "devDependencies": {
+    "typescript": "^4.5.5",
     "@types/node": "^16.11.0",
     "codecov": "^3.8.3",
     "nyc": "^15.1.0",
     "qnit": "0.25.0",
-    "typescript": "^4.5.5"
+    "grunt": "^1.4.1",
+    "grunt-run": "^0.8.1"
   },
   "scripts": {
     "build": "tsc",
     "test": "tsc ; qnit test-*",
     "coverage": "tsc ; nyc --include tzinfo.js --reporter lcov --reporter text npm test",
     "clean": "rm -rf .nyc_output coverage npm-debug.log"
-  }
+  },
+  "files": [
+    "tzinfo.js",
+    "tzinfo.d.ts",
+    "package.json"
+  ]
 }
