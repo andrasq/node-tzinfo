@@ -13,18 +13,19 @@
   "author": "Andras",
   "repository": "https://github.com/andrasq/node-tzinfo.git",
   "license": "Apache-2.0",
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
-    "typescript": "^4.5.5",
     "@types/node": "^16.11.0",
     "codecov": "^3.8.3",
+    "grunt": "^1.4.1",
+    "grunt-run": "^0.8.1",
     "nyc": "^15.1.0",
     "qnit": "0.25.0",
-    "grunt": "^1.4.1",
-    "grunt-run": "^0.8.1"
+    "typescript": "^4.5.5",
+    "uglify-js": "^3.15.0"
   },
   "scripts": {
+    "prepack": "tsc; uglifyjs tzinfo.js -o tzinfo.js",
     "build": "tsc",
     "test": "tsc ; qnit test-*",
     "coverage": "tsc ; nyc --include tzinfo.js --reporter lcov --reporter text npm test",
