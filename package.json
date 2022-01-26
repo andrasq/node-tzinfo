@@ -13,7 +13,10 @@
   "author": "Andras",
   "repository": "https://github.com/andrasq/node-tzinfo.git",
   "license": "Apache-2.0",
-  "dependencies": {},
+  "dependencies": {
+    "grunt": "^1.4.1",
+    "grunt-run": "^0.8.1"
+  },
   "devDependencies": {
     "@types/node": "^16.11.0",
     "codecov": "^3.8.3",
@@ -23,8 +26,8 @@
   },
   "scripts": {
     "build": "tsc",
-    "test": "npm i; tsc ; qnit test-*",
-    "coverage": "npm i; tsc ; nyc --include tzinfo.js --reporter lcov --reporter text npm test",
+    "test": "tsc ; qnit test-*",
+    "coverage": "tsc ; nyc --include tzinfo.js --reporter lcov --reporter text npm test",
     "clean": "rm -rf .nyc_output coverage npm-debug.log"
   }
 }
