@@ -2,20 +2,29 @@
   "name": "tzinfo",
   "version": "0.5.1",
   "description": "parse tzinfo files",
-  "keywords": [ "tz", "tzinfo", "tzdata", "timezone", "parse" ],
+  "keywords": [
+    "tz",
+    "tzinfo",
+    "tzdata",
+    "timezone",
+    "parse"
+  ],
   "main": "tzinfo.js",
   "author": "Andras",
   "repository": "https://github.com/andrasq/node-tzinfo.git",
   "license": "Apache-2.0",
-
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
-    "qnit": "0.25.0"
+    "@types/node": "^16.11.0",
+    "codecov": "^3.8.3",
+    "nyc": "^15.1.0",
+    "qnit": "0.25.0",
+    "typescript": "^4.5.5"
   },
   "scripts": {
-    "test": "qnit test-*",
-    "coverage": "nyc --include tzinfo.js --reporter lcov --reporter text npm test",
+    "build": "tsc",
+    "test": "npm i; tsc ; qnit test-*",
+    "coverage": "npm i; tsc ; nyc --include tzinfo.js --reporter lcov --reporter text npm test",
     "clean": "rm -rf .nyc_output coverage npm-debug.log"
   }
 }

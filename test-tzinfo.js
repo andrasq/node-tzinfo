@@ -13,7 +13,7 @@ var tzinfo = require('./');
 
 // America/Jamaica zoneinfo file, edited to add a leap second.
 // Note: this is "America/Jamaica" from mid-2017, without the later /usr/share/zoneinfo updates
-var ziJamaica = new Buffer([
+var ziJamaica = Buffer.from([
 0x54, 0x5a, 0x69, 0x66,
 0x32,
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -382,13 +382,13 @@ module.exports = {
     'helpers': {
         'readStringZ': {
             'should extract asciiz string': function(t) {
-                var buf = new Buffer("ABC\0DEF\0GHI\0\0");
+                var buf = Buffer.from("ABC\0DEF\0GHI\0\0");
                 t.equal(tzinfo.readStringZ(buf, 0), 'ABC');
                 t.equal(tzinfo.readStringZ(buf, 1), 'BC');
                 t.equal(tzinfo.readStringZ(buf, 4), 'DEF');
                 t.equal(tzinfo.readStringZ(buf, 5), 'EF');
                 t.equal(tzinfo.readStringZ(buf, 12), '');
-                t.equal(tzinfo.readStringZ(new Buffer("ABC"), 1), 'BC');
+                t.equal(tzinfo.readStringZ(Buffer.from("ABC"), 1), 'BC');
                 t.done();
             },
         },
@@ -397,17 +397,17 @@ module.exports = {
             'should extract 32-bit signed int': function(t) {
                 t.equal(tzinfo.readInt32([255, 255, 255, 255], 0), -1);
 
-                var buf = new Buffer([128, 0, 0, 0, 0, 1]);
+                var buf = Buffer.from([128, 0, 0, 0, 0, 1]);
                 t.equal(tzinfo.readInt32(buf, 0), (1 << 31));
                 t.equal(tzinfo.readInt32(buf, 1), 0);
                 t.equal(tzinfo.readInt32(buf, 2), 1);
 
-                var buf = new Buffer([1, 2, 3, 4, 5, 6, 7, 8]);
+                var buf = Buffer.from([1, 2, 3, 4, 5, 6, 7, 8]);
                 t.equal(tzinfo.readInt32(buf, 0), 0x01020304);
                 t.equal(tzinfo.readInt32(buf, 1), 0x02030405);
                 t.equal(tzinfo.readInt32(buf, 3), 0x04050607);
 
-                var buf = new Buffer([255, 255, 255, 255, 1, 2, 3, 4]);
+                var buf = Buffer.from([255, 255, 255, 255, 1, 2, 3, 4]);
                 t.equal(tzinfo.readInt32(buf, 0), -1);
                 t.equal(tzinfo.readInt32(buf, 1), (0xffffff01 >> 0));   // -256 + 1
                 t.equal(tzinfo.readInt32(buf, 2), (0xffff0102 >> 0));   // -65536 + 256 + 2
@@ -420,18 +420,18 @@ module.exports = {
             'should extract 64-bit signed int': function(t) {
                 t.equal(tzinfo.readInt32([255, 255, 255, 255, 255, 255, 255, 255], 0), -1);
 
-                var buf = new Buffer([128, 0, 0, 0, 0, 0, 0, 0, 0, 1]);
+                var buf = Buffer.from([128, 0, 0, 0, 0, 0, 0, 0, 0, 1]);
                 t.equal(tzinfo.readInt64(buf, 0), -0x8000000000000000);
                 t.equal(tzinfo.readInt64(buf, 1), 0);
                 t.equal(tzinfo.readInt64(buf, 2), 1);
 
-                var buf = new Buffer([0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8]);
+                var buf = Buffer.from([0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8]);
                 t.equal(tzinfo.readInt64(buf, 0), 0x01020304);
                 t.equal(tzinfo.readInt64(buf, 1), 0x0102030405);
                 t.equal(tzinfo.readInt64(buf, 2), 0x010203040506);
                 t.equal(tzinfo.readInt64(buf, 3), 0x01020304050607);
 
-                var buf = new Buffer([255, 255, 255, 255, 255, 255, 255, 1, 2, 3, 4, 5, 6, 7, 8]);
+                var buf = Buffer.from([255, 255, 255, 255, 255, 255, 255, 1, 2, 3, 4, 5, 6, 7, 8]);
                 t.equal(tzinfo.readInt64(buf, 0), -256 + 1);
                 t.equal(tzinfo.readInt64(buf, 1), -65536 + 256 + 2);
                 t.equal(tzinfo.readInt64(buf, 2), -16777216 + 65536 + 512 + 3);

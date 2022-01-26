@@ -1,0 +1,6 @@
+/tsc
+/tzinfo.js
+/node_modules
+/.nyc_output
+/coverage
+/tzinfo.d.ts

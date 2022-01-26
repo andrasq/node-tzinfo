@@ -2,9 +2,12 @@
  * parse tzinfo files
  *
  * Copyright (C) 2017-2018 Andras Radics
- * Licensed under the Apache License, Version 2.0
+ * Copyright (C) 2022-2023 Stoian Ivanov
+ *
+* Licensed under the Apache License, Version 2.0
  * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
  *
+ * 2022-02-26 - TS port - SI.
  * 2017-11-24 - Started - AR.
  */
 
@@ -23,27 +26,40 @@
  * tzinfo(5) - unix manpage describing the timezone info file layout
  */
 
-'use strict';
 
-var fs = require('fs');
-var zoneinfoDir = locateZoneinfoDirectory();
+import fs from 'fs';
+export const  zoneinfoDir = locateZoneinfoDirectory();
 
-module.exports = {
-    getZoneinfoDirectory: getZoneinfoDirectory,
-    listZoneinfoFiles: listZoneinfoFiles,
-    readZoneinfoFileSync: readZoneinfoFileSync,
-    readZoneinfoFile: readZoneinfoFile,
-    parseZoneinfo: parseZoneinfo,
-    findTzinfo: findTzinfo,
+export interface tzinfo_change_t {
+    idx: number,
+    tt_gmtoff: number,     // seconds to add to GMT to get localtime
+    tt_isdst: number,               // whether DST in effect
+    tt_abbrind: number,             // byte offset into abbrevs of tz name abbreviation
+    abbrev: string,
+}
 
-    absearch: absearch,
-    locateZoneinfoDirectory: locateZoneinfoDirectory,
-    zoneinfoDir: zoneinfoDir,
-    readStringZ: readStringZ,
-    readInt32: readInt32,
-    readInt64: readInt64,
-};
+export interface info_t {
+    magic: string;             // 'TZif'
+    version: string;           // '\0' or '2'
 
+    ttisgmtcnt: number,         // num gmt/local indicators stored in `ttisgmt`
+    ttisstdcnt: number,         // num standard/wall indicators stored in `ttisstd`
+    leapcnt:    number,         // num leap seconds for which data is stored in `leaps`
+    timecnt:    number,         // num transition types stored in `types'
+    typecnt:    number,         // num time transition structs stored in `tzinfo`
+    charcnt:    number,         // total num chars to store the tz name abbreviations
+
+    ttimes:     number[],                // transition time timestamps (timecnt)
+    types:      number[],                // tzinfo index of each time transitioned to (timecnt)
+    tzinfo:     tzinfo_change_t[],                // tzinfo structs (typecnt)
+    abbrevs:    string,                // concatenated tz name abbreviations (asciiz strings totaling charcnt bytes)
+    leaps:      unknown[],                // leap second descriptors (leapcnt)
+    ttisstd:    unknown[],                // transitions of tzinfo were std or wallclock times (ttisstdcnt)
+    ttisgmt:    unknown[],                // transitions of tzinfo were UTC or local time (ttisgmtcnt)
+
+    _v1end:  number,
+    _v2end:  number,
+}
 
 // zoneinfo file layout: (see tzinfo(5) manpage)
 // header:
@@ -58,18 +74,20 @@ module.exports = {
 //     ttisstdcnt 1B std/wall times show whether transition times were std or wallclock (?)
 //     ttisgmtcnt 1B show whether transition times were gmt or local (?)
 //
-function parseZoneinfo( buf ) {
+export function parseZoneinfo( buf:Buffer ):info_t|false {
     var info = parseV1Zoneinfo(buf, 0);
+    if (info==false) return false;
 
     if (info.version === '2') {
-        var v2info = parseV2Zoneinfo(buf, info._v1end);
+        return parseV2Zoneinfo(buf, info._v1end);
     }
 
-    return (info.version === '2') ? v2info : info;
+    return info;
 }
 
-function parseV1Zoneinfo( buf, pos ) {
-    var info = {
+
+function parseV1Zoneinfo( buf:Buffer, pos:number ):info_t|false {
+    var info:info_t = {
         magic:   buf.toString(undefined, 0, 4), // 'TZif'
         version: buf.toString(undefined, 4, 5), // '\0' or '2'
 
@@ -83,12 +101,13 @@ function parseV1Zoneinfo( buf, pos ) {
         ttimes:     new Array(),                // transition time timestamps (timecnt)
         types:      new Array(),                // tzinfo index of each time transitioned to (timecnt)
         tzinfo:     new Array(),                // tzinfo structs (typecnt)
-        abbrevs:    new Array(),                // concatenated tz name abbreviations (asciiz strings totaling charcnt bytes)
+        abbrevs:    '',                         // concatenated tz name abbreviations (asciiz strings totaling charcnt bytes)
         leaps:      new Array(),                // leap second descriptors (leapcnt)
         ttisstd:    new Array(),                // transitions of tzinfo were std or wallclock times (ttisstdcnt)
         ttisgmt:    new Array(),                // transitions of tzinfo were UTC or local time (ttisgmtcnt)
 
-        _v1end:  null,
+        _v1end:  0,
+        _v2end:  0,
     };
     var pos = 4 + 1 + 15 + 24;                  // magic + version + reserved + header
 
@@ -110,7 +129,7 @@ function parseV1Zoneinfo( buf, pos ) {
             tt_gmtoff: readInt32(buf, pos),     // seconds to add to GMT to get localtime
             tt_isdst: buf[pos+4],               // whether DST in effect
             tt_abbrind: buf[pos+5],             // byte offset into abbrevs of tz name abbreviation
-            abbrev: null,
+            abbrev: '',
         };
         pos += 6;
     }
@@ -143,9 +162,9 @@ function parseV1Zoneinfo( buf, pos ) {
     return info;
 }
 
-function parseV2Zoneinfo( buf, pos ) {
+function parseV2Zoneinfo( buf:Buffer, pos:number ):info_t|false {
     // read-read the V2 header, then the V2 data
-    var info = {
+    var info:info_t = {
         magic:   buf.toString(undefined, pos+0, pos+4),
         version: buf.toString(undefined, pos+4, pos+5),
 
@@ -159,12 +178,13 @@ function parseV2Zoneinfo( buf, pos ) {
         ttimes:  new Array(),
         types:   new Array(),
         tzinfo:  new Array(),
-        abbrevs: new Array(),
+        abbrevs: '',
         leaps:   new Array(),
         ttisstd: new Array(),
         ttisgmt: new Array(),
 
-        _v2end:  null,
+        _v1end:  0,
+        _v2end:  0,
     };
     pos += 4 + 1 + 15 + 24;
 
@@ -181,7 +201,7 @@ function parseV2Zoneinfo( buf, pos ) {
     }
 
     for (var i=0; i<info.typecnt; i++) {
-        info.tzinfo[i] = { idx: i, tt_gmtoff: readInt32(buf, pos), tt_isdst: buf[pos+4], tt_abbrind: buf[pos+5] };
+        info.tzinfo[i] = { idx: i, tt_gmtoff: readInt32(buf, pos), tt_isdst: buf[pos+4], tt_abbrind: buf[pos+5], abbrev:'' };
         pos += 6;
     }
 
@@ -211,15 +231,15 @@ function parseV2Zoneinfo( buf, pos ) {
 }
 
 // return the NUL-terminated string from buf at offset
-function readStringZ( buf, offset ) {
+export function readStringZ( buf:Buffer, offset:number ):string {
     for (var end=offset; buf[end]; end++) ;
     return buf.toString(undefined, offset, end);
 }
-function readInt32( buf, offset ) {
+export function readInt32( buf:Buffer, offset:number ):number {
     var val = (buf[offset++] * 0x1000000) + (buf[offset++] << 16) + (buf[offset++] << 8) + buf[offset++];
     return (val & 0x80000000) ? val - 0x100000000 : val;
 }
-function readInt64( buf, offset ) {
+export function readInt64( buf:Buffer, offset:number ):number {
     if (buf[offset] & 0x80) {
         // negative
         // a large negative eg FFFE can be built out of a scaled negative prefix FF * 256 and
@@ -237,7 +257,7 @@ function readInt64( buf, offset ) {
 }
 
 
-function locateZoneinfoDirectory( ) {
+export function locateZoneinfoDirectory( ):string {
     var tryDirs = [
         '/usr/share/zoneinfo',
         '/usr/lib/zoneinfo',
@@ -252,17 +272,17 @@ function locateZoneinfoDirectory( ) {
     throw new Error("tzinfo files not found");
 }
 
-function readZoneinfoFileSync( tzname ) {
+export function readZoneinfoFileSync( tzname:string ):Buffer {
     var filepath = zoneinfoDir + '/' + tzname;
     return fs.readFileSync(filepath);
 }
 
-function readZoneinfoFile( tzname, cb ) {
+export function readZoneinfoFile( tzname:string, cb:(err: NodeJS.ErrnoException | null, data: Buffer) => void ) {
     var filepath = zoneinfoDir + '/' + tzname;
     return fs.readFile(filepath, cb);
 }
 
-function findTzinfo( info, date, firstIfTooOld ) {
+export function findTzinfo( info:info_t, date:number|Date|string, firstIfTooOld:boolean ) {
     var seconds = ((typeof date === 'number') ? date :          // milliseconds
                    (date instanceof Date) ? date.getTime() :    // Date object
                    new Date(date).getTime());                   // datetime string
@@ -288,7 +308,7 @@ function findTzinfo( info, date, firstIfTooOld ) {
 
 // search the sorted array for the index of the largest element
 // not greater than val.  Returns the index of the element if found, else -1.
-function absearch( array, val ) {
+export function absearch( array:number[], val:number ) {
     var hi, lo, mid;
 
     // binary search to approximate the location of val
@@ -309,22 +329,22 @@ function absearch( array, val ) {
     return -1;
 }
 
-function getZoneinfoDirectory( ) {
+export function getZoneinfoDirectory( ) {
     return zoneinfoDir;
 }
 
 // find the names of all the zoneinfo files on the system.
 // This is a blocking operation, so call it only on startup.
 // The list is small, 80 kb or so, so can be cached.
-function listZoneinfoFiles( dirname ) {
-    var tzfiles = new Array();
+export function listZoneinfoFiles( dirname:string ):string[] {
+    var tzfiles:string[] = new Array();
     try {
         var files = fs.readdirSync(dirname);
     } catch (err) {
         return [];
     }
 
-    var stat, buf = new Buffer(8);
+    var stat, buf = Buffer.alloc(8);
     for (var i=0; i<files.length; i++) {
         var filepath = dirname + '/' + files[i];
         try {
