@@ -308,6 +308,12 @@ module.exports = {
             t.ok(tzinfo.findTzinfo(ziUtc, 0));
             t.ok(tzinfo.findTzinfo(ziUtc, '2999-01-01T01:02:03Z'));
 
+            // even when the timezone entry has no time transitions (eg on Debian 8)
+            var ziPartial = tzinfo.parseZoneinfo(tzinfo.readZoneinfoFileSync("GMT"));
+            ziPartial.timecnt = 0;
+            ziPartial.ttimes = [];
+            t.ok(tzinfo.findTzinfo(ziPartial, now));
+
             t.done();
         },
 
