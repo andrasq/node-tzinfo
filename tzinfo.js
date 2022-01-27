@@ -1,7 +1,7 @@
 /**
  * parse tzinfo files
  *
- * Copyright (C) 2017-2018 Andras Radics
+ * Copyright (C) 2017-2018,2022 Andras Radics
  * Licensed under the Apache License, Version 2.0
  * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -27,6 +27,9 @@
 
 var fs = require('fs');
 var zoneinfoDir = locateZoneinfoDirectory();
+
+// allocBuf from qibl
+var allocBuf = eval('parseInt(process.versions.node) > 6 ? Buffer.allocUnsafe : Buffer');
 
 module.exports = {
     getZoneinfoDirectory: getZoneinfoDirectory,
@@ -324,7 +327,7 @@ function listZoneinfoFiles( dirname ) {
         return [];
     }
 
-    var stat, buf = new Buffer(8);
+    var stat, buf = allocBuf(8);
     for (var i=0; i<files.length; i++) {
         var filepath = dirname + '/' + files[i];
         try {

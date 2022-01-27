@@ -84,6 +84,7 @@ look at `zoneinfo.ttisstd[tzinfo.idx]` and `zoneinfo.ttisgmt[tzinfo.idx]`.
 Change Log
 ----------
 
+- 0.5.2 - fix Buffer deprecation warnings
 - 0.5.1 - always find GMT zoneinfo
 - 0.5.0 - findTzinfo option to return the oldest known tzinfo struct for very old dates
 - 0.4.2 - more tests, make `readStringZ` stop on unterminated strings
