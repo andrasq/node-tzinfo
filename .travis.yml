@@ -16,7 +16,7 @@ before_install:
   - nvm install 8 && npm2 -v && node -v && npm2 test
   - nvm install 12 && npm2 -v && node -v && npm2 test
   - nvm install 16 && npm2 -v && node -v && npm2 test
-  - nvm install 0.5.8
+  - nvm install 5.8.0
 
 after_success:
   - if [ `node -v` != "v5.8.0" ]; then exit; fi
