@@ -65,7 +65,7 @@ given `date`.  Returns a `tzinfo` struct or `false` if the date is before the ea
 time transition on record or if date is not valid.  If `date` precedes the first known
 time transition but `firstIfTooOld` is truthy, it returns the oldest tzinfo struct.
 If there are no time transitions defined but there is a tzinfo struct, it returns the
-tzinfo struct (to always succeed for GMT and UTC).
+first tzinfo struct (to always succeed for GMT and UTC).
 
 Tzinfo format:
 
