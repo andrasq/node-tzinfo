@@ -1,7 +1,7 @@
 tzinfo
 ======
 
-[![Build Status](https://api.travis-ci.org/andrasq/node-tzinfo.svg?branch=master)](https://travis-ci.org/andrasq/node-tzinfo?branch=master)
+[![Build Status](https://api.travis-ci.com/andrasq/node-tzinfo.svg?branch=master)](https://travis-ci.com/andrasq/node-tzinfo?branch=master)
 [![Coverage Status](https://codecov.io/github/andrasq/node-tzinfo/coverage.svg?branch=master)](https://codecov.io/github/andrasq/node-tzinfo?branch=master)
 
 Functions to parse /usr/share/zoneinfo timezone info files.
