@@ -50,10 +50,9 @@ Returned object format:
 
         ttimes:     // array of `timecnt` transition time timestamps
         types:      // array of `timecnt` tzinfo indices for each time transitioned to
-        tzinfo:     // array of `typecnt` tzinfo structs
-                    //     { idx: , tt_gmtoff: , tt_isdst: , tt_abbrind: }
+        tzinfo:     // array of `typecnt` tzinfo structs (see below)
         abbrevs:    // concatenated tz name abbreviations (asciiz strings totaling charcnt bytes)
-        leaps:      // array of `leapcnt` leap second descriptors
+        leaps:      // array of `leapcnt` leap second descriptors `{ time, add }`
         ttisstd:    // array of `ttisstdcnt` transitions of tzinfo were std or wallclock times
         ttisgmt:    // array of `ttisgmtcnt` transitions of tzinfo were UTC or local time
     };
@@ -67,14 +66,14 @@ time transition but `firstIfTooOld` is truthy, it returns the oldest tzinfo stru
 If there are no time transitions defined but there is a tzinfo struct, it returns the
 first tzinfo struct (to always succeed for GMT and UTC).
 
-Tzinfo format:
+Tzinfo format, a slightly expanded `tzfile(5)` `struct ttinfo`:
 
     tzinfo = {
         idx:        // index of this entry in `zoneinfo.tzinfo`
         tt_gmtoff:  // seconds to add to GMT to get localtime
         tt_isdst:   // whether daylight saving is in effect
         tt_abbrind: // byte offset in abbrevs of tz name abbreviation
-        abbrev:     // timezone name abbreviation, eg 'EDT'
+        abbrev:     // timezone name abbreviation, eg 'EDT', from `zoneinfo.abbrevs`
     };
 
 To find the POSIX-style timezone environment variable attributes associated with this `tzinfo`,
