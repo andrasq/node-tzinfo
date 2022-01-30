@@ -7,6 +7,18 @@ tzinfo
 Functions to parse /usr/share/zoneinfo timezone info files.
 Parses both v1 and v2 format zoneinfo files.
 
+    const tzinfo = require('tzinfo');
+    const buf = tzinfo.readZoneinfoFileSync('America/New_York');
+    const zoneInfo = tzinfo.parseZoneinfo(buf);
+    const tzInfo = tzinfo.findTzinfo(zoneInfo, '2020-07-02T03:04:05.678');
+    // => {
+    //   idx: 1,
+    //   tt_gmtoff: -14400,
+    //   tt_isdst: 1,
+    //   tt_abbrind: 4,
+    //   abbrev: 'EDT'
+    // }
+
 
 Api
 ---
