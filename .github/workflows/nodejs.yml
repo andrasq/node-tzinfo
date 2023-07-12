@@ -1,0 +1,39 @@
+name: build
+on:
+  push:
+    # branches: [ $default-branch, ar-test ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [ 0.10.42, 4, 8, 12, 17, 5.8.0 ]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node }}
+      - run: npm install
+      - run: npm test
+
+      - name: npm test v0.8
+        if: ${{ matrix.node == '5.8.0' }}
+        run: |
+          mkdir -p node_modules/.bin
+          curl -s https://nodejs.org/dist/v0.8.28/node-v0.8.28-linux-x64.tar.gz > node.tgz
+          tar xfzO node.tgz node-v0.8.28-linux-x64/bin/node > node_modules/.bin/node
+          chmod a+rx node_modules/.bin/node
+          node -v
+          npm test
+          rm node_modules/.bin/node
+
+      - name: test coverage
+        if: ${{ matrix.node == '5.8.0' }}
+        run: |
+          npm install -g nyc@8.4.0
+          npm run coverage
+      - name: upload coverage
+        if: ${{ matrix.node == '5.8.0' }}
+        uses: coverallsapp/github-action@v1.1.2
+        with:
+          github-token: ${{ github.token }}
