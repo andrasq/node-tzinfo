@@ -1,7 +1,7 @@
 tzinfo
 ======
 [![Build Status](https://github.com/andrasq/node-tzinfo/actions/workflows/nodejs.yml/badge.svg)](https://github.com/andrasq/node-tzinfo/actions/workflows/nodejs.yml)
-[![Coverage Status](https://codecov.io/github/andrasq/node-tzinfo/coverage.svg?branch=master)](https://codecov.io/github/andrasq/node-tzinfo?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/andrasq/node-tzinfo/badge.svg?branch=master)](https://coveralls.io/github/andrasq/node-tzinfo?branch=master)
 
 Functions to parse /usr/share/zoneinfo timezone info files.
 Parses both v1 and v2 format zoneinfo files.
